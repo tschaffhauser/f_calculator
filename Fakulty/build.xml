@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="MyProjectName">
+
+	<property name="src" value="src" />
+	<property name="build" value="build" />
+	<property name="dist" value="dist" />
+	<property name="version" value="1.0" />
+	
+	<!--
+	<property file="build.properties"/>
+	-->
+	<path id="libraries">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+		<mkdir dir="${dist}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}">
+			<classpath refid="libraries" />
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile" description="generate the distribution">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/lib" />
+
+		<copy todir="${dist}/lib" flatten="true">
+			<path refid="libraries" />
+		</copy>
+		
+		<!-- Copy environment specific files -->
+		<!--
+		<mkdir dir="${build}/config"/>
+		<copy file="config/server.properties.${environment}" tofile="${build}/config/server.properties"/>
+		-->
+
+		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+		<jar jarfile="${dist}/MyProject-v${version}-${DSTAMP}.jar"
+			basedir="${build}">
+			<zipgroupfileset dir="${dist}/lib" includes="*.jar" />
+			<manifest>
+				<attribute name="Main-Class" value="ch.fhnw.mas.wettingen" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+	
+	<target name="javadoc">
+		<javadoc packagenames="ch.fhnw.mas.wettingen.*"
+		           sourcepath="src"
+		           excludepackagenames="com.dummy.test.doc-files.*"
+		           defaultexcludes="yes"
+		           destdir="docs/api"
+		           author="true"
+		           version="true"
+		           use="true"
+		           windowtitle="Test API">
+		    <doctitle><![CDATA[<h1>Test</h1>]]></doctitle>
+		    <bottom><![CDATA[<i>Copyright &#169; 2000 Dummy Corp. All Rights Reserved.</i>]]></bottom>
+		    <tag name="todo" scope="all" description="To do:"/>
+		    <!-- <group title="Group 1 Packages" packages="*"/> -->
+			<!-- <group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/> -->
+		    <link offline="true" href="http://docs.oracle.com/javase/7/docs/api/" packagelistLoc="C:\tmp"/>
+		    <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+		  </javadoc>
+	</target>	
+
+</project>
